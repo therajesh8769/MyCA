@@ -1,0 +1,224 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.header .logo {
+    font-size: 24px;
+    font-weight: bold;
+    flex: 1;
+    text-align: center;
+}
+
+.header nav {
+    display: flex;
+    gap: 25px;
+}
+
+.header nav a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.header nav a:hover {
+    background-color: #575757;
+}
+
+.header .user-actions {
+    display: flex;
+    gap: 25px;
+}
+
+.header .user-actions a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.header .user-actions a:hover {
+    background-color: #575757;
+}
+
+.header .menu-toggle {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.nav-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.nav-wrapper .close-menu {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    display: none; /* Initially hidden */
+}
+
+@media (max-width: 786px) {
+    .header nav,
+    .header .user-actions {
+        display: none;
+    }
+
+    .header .menu-toggle {
+        display: block;
+    }
+
+    .header .logo {
+        text-align: center;
+        flex: 1;
+    }
+
+    .nav-open .nav-wrapper {
+        display: block;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 250px;
+        height: 100%;
+        background-color: #333;
+        padding: 10px;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    .nav-open .header nav,
+    .nav-open .header .user-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .nav-open .header {
+        position: relative;
+        z-index: 1001;
+    }
+
+    .nav-open .home,
+    .nav-open .footer {
+        margin-right: 250px;
+    }
+
+    .nav-open .nav-wrapper .close-menu {
+        display: block;
+    }
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 100px;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.footer p {
+    margin: 0;
+}
+
+.footer nav {
+    margin-top: 10px;
+}
+
+.footer nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.footer nav a:hover {
+    text-decoration: underline;
+}
+
+
+
+#heading
+{   
+    text-align: center;
+    color:#333;
+    
+
+}
+.home{
+    align-items: center;
+    padding: 20px;
+    justify-content: center;
+    min-height: 100vh;
+}
+.money_input
+{
+    max-width: 400px;
+    background-color: #f9f9f9;
+    padding:20px;
+    border-radius: 8px;
+    margin:auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.money_input label{
+    display: inline-block;
+    align-items: center;
+     /* Align items vertically */
+    margin-right: 20px;
+    padding:10px
+}
+
+.money_input input[type="number"],
+.money_input select,
+.money_input  input[type="date"],
+.money_input textarea
+{
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.money_input input[type="radio"]
+{
+    margin-right: 5px;
+
+
+}
+.money_input button[type="submit"]
+{   width: 100px;
+    
+    background-color: #333;
+    color:white;
+    border:2px solid rgb(98, 102, 92);
+    padding:10px 20px;
+    border-radius: 10px;
+    cursor:pointer;
+    transition: background-color 0.3s;
+}
+
+
+.card
+{
+    display: flex;
+    justify-content: center!important;
+}
