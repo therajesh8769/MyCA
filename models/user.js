@@ -12,6 +12,18 @@ const passportLocalMongoose=require("passport-local-mongoose");
         type:String,
         required:true,
         
+    },
+    mobileNo: {
+        type: String,
+        sparse: true,
+        unique: true
+    },
+    upiId: {
+        type: String
+    },
+    defaultInterestRate: {
+        type: Number,
+        default: 0
     }
 
  });

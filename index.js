@@ -13,6 +13,7 @@ const { isLoggedIn } = require('./middleware/middleware.js');
 const trans = require('./models/trans');
 const User = require('./models/user');
 const userRouter = require('./routes/user.js');
+const loansRouter = require('./routes/loans.js');
 require('dotenv').config();
 
 
@@ -74,9 +75,34 @@ app.listen(port, () => {
     console.log(`listening to port ${port}`);
 });
 app.use("/",userRouter);
+app.use("/loans", loansRouter);
 
 app.get('/home', (req, res) => {
     res.render('index.ejs');
+});
+
+app.get('/calculator', (req, res) => {
+    res.render('calculator.ejs');
+});
+
+const Loan = require('./models/loan');
+
+app.get('/api/loans/due', isLoggedIn, async (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Find accepted borrowings that are due today or overdue
+        const dueLoans = await Loan.find({
+            borrower: req.user._id,
+            status: 'accepted',
+            dueDate: { $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000) } // Up to end of today
+        });
+
+        res.json({ dueLoans });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch due loans" });
+    }
 });
 
 app.post('/home',isLoggedIn, async(req, res) => {

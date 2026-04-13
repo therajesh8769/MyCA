@@ -12,13 +12,13 @@ module.exports.signupForm=async(req,res)=>
             {
                 throw new ExpressError(400,"Error! send valid data");
             }
-            const {username,email,password}=user;
+            const {username,email,password,mobileNo,upiId,defaultInterestRate}=user;
             if (!username || !email || !password) {
                 throw new ExpressError(400, "Error! Username, email, and password are required");
             }
     
         
-            const newUser= new User({username,email});
+            const newUser= new User({username,email,mobileNo,upiId,defaultInterestRate});
             
           const res5=  await User.register(newUser,password);
           console.log(res5);
