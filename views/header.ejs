@@ -1,26 +1,60 @@
-<header class="header">
-    <div class="logo">My CA</div>
-    <div class="menu-toggle" onclick="toggleMenu()">&#9776;</div>
-   <div class="nav-wrapper">
-    <nav>
-        <a href="/home">Home</a>
-        <a href="/account">My profile</a>
-        
-    
-    </nav>
-    <div class="user-actions">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/home">My CA</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/home">Home</a>
+        </li>
+        <% if(currUser){%>
+        <li class="nav-item">
+          <a class="nav-link" href="/account">My Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/loans">Loans</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/calculator">Calculator</a>
+        </li>
+        <% } %>
+      </ul>
+      <div class="d-flex">
         <% if(!currUser){%>
-            <a href="/login">Login</a>
-            <a href="/signup">Register</a>
-       <% }%>
-       <% if(currUser){%>
-        <a href="/logout">Logout</a>
-
-   <% }%>
-        
-
+            <a class="btn btn-outline-light me-2" href="/login">Login</a>
+            <a class="btn btn-primary" href="/signup">Register</a>
+        <% } else { %>
+            <a class="btn btn-outline-danger" href="/logout">Logout</a>
+        <% } %>
+      </div>
     </div>
-    <div class="close-menu" onclick="toggleMenu()">&times;</div> <!-- Close menu icon -->
-   </div>
-   <script src="/main.js"></script>
-</header>
+  </div>
+</nav>
+
+   <% if(currUser){%>
+   <script>
+       // Push Notification Reminder Script
+       if (!sessionStorage.getItem('notificationChecked')) {
+           sessionStorage.setItem('notificationChecked', 'true');
+           if ("Notification" in window) {
+               Notification.requestPermission().then(function (permission) {
+                   if (permission === "granted") {
+                       fetch('/api/loans/due')
+                           .then(response => response.json())
+                           .then(data => {
+                               if (data.dueLoans && data.dueLoans.length > 0) {
+                                   new Notification("Loan Reminder", {
+                                       body: `You have ${data.dueLoans.length} loan(s) due today or overdue!`,
+                                       icon: "/favicon.ico" // Change to your icon if available
+                                   });
+                               }
+                           })
+                           .catch(err => console.error("Error fetching due loans:", err));
+                   }
+               });
+           }
+       }
+   </script>
+   <% } %>
