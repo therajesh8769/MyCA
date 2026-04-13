@@ -10,11 +10,11 @@ module.exports.signupForm=async(req,res)=>
         
            if(!user)
             {
-                throw new ExpressError(400,"Error! send valid data");
+                throw new Error("Error! send valid data");
             }
             const {username,email,password,mobileNo,upiId,defaultInterestRate}=user;
             if (!username || !email || !password) {
-                throw new ExpressError(400, "Error! Username, email, and password are required");
+                throw new Error("Error! Username, email, and password are required");
             }
     
         
