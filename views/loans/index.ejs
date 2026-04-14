@@ -56,10 +56,12 @@
                                             <%
                                             // Ideally, populate target user to get their UPI ID,
                                             // Assuming the target user is populated in borrower
-                                            let upiId = req.borrower && req.borrower.upiId ? req.borrower.upiId : 'placeholder@upi';
-                                            let name = req.borrower && req.borrower.username ? req.borrower.username : 'User';
+                                            let rawUpiId = req.borrower && req.borrower.upiId ? req.borrower.upiId : 'placeholder@upi';
+                                            let rawName = req.borrower && req.borrower.username ? req.borrower.username : 'User';
+                                            let upiId = encodeURIComponent(rawUpiId);
+                                            let name = encodeURIComponent(rawName);
                                             %>
-                                            <a href="upi://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= req.amount %>&cu=INR" class="btn btn-sm btn-info text-white">Accept & Pay via UPI</a>
+                                            <a href="upi://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= req.amount %>&cu=INR&tn=Loan%20Request" class="btn btn-sm btn-info text-white">Accept & Pay via UPI</a>
                                         <% } %>
                                     </div>
                                 </li>
@@ -110,10 +112,12 @@
                                         <button class="btn btn-sm btn-outline-danger">Mark Settled</button>
                                     </form>
                                     <%
-                                    let upiId = loan.lender && loan.lender.upiId ? loan.lender.upiId : 'placeholder@upi';
-                                    let name = loan.lender && loan.lender.username ? loan.lender.username : 'Lender';
+                                    let rawUpiId = loan.lender && loan.lender.upiId ? loan.lender.upiId : 'placeholder@upi';
+                                    let rawName = loan.lender && loan.lender.username ? loan.lender.username : 'Lender';
+                                    let upiId = encodeURIComponent(rawUpiId);
+                                    let name = encodeURIComponent(rawName);
                                     %>
-                                    <a href="upi://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= loan.amount %>&cu=INR" class="btn btn-sm btn-info text-white mt-2">Pay via UPI</a>
+                                    <a href="upi://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= loan.amount %>&cu=INR&tn=Loan%20Repayment" class="btn btn-sm btn-info text-white mt-2">Pay via UPI</a>
                                 </li>
                             <% }) %>
                         <% } %>
