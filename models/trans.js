@@ -1,6 +1,5 @@
 const mongoose=require("mongoose");
 const Schema=mongoose.Schema;
-const moment = require('moment-timezone');
 
 const transSchema=new Schema(
     {
