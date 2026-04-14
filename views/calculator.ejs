@@ -26,8 +26,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="calcTime" class="form-label">Time Period (Years)</label>
-                        <input type="number" step="0.01" class="form-control" id="calcTime" required>
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate" required>
                     </div>
 
                     <div class="mb-3">
@@ -44,6 +49,7 @@
 
                 <div id="calcResult" class="mt-4 alert alert-info" style="display: none;">
                     <h5>Results</h5>
+                    <p>Total Time Period: <span id="resTimePeriod">0</span></p>
                     <p>Total Interest: <span id="resInterest">0</span></p>
                     <p>Total Amount (Principal + Interest): <span id="resTotal">0</span></p>
                 </div>
@@ -55,13 +61,26 @@
         function calculateInterest() {
             const p = parseFloat(document.getElementById('calcAmount').value);
             const r = parseFloat(document.getElementById('calcRate').value);
-            const t = parseFloat(document.getElementById('calcTime').value);
+            const startDateStr = document.getElementById('startDate').value;
+            const endDateStr = document.getElementById('endDate').value;
             const type = document.getElementById('calcType').value;
 
-            if (isNaN(p) || isNaN(r) || isNaN(t)) {
-                alert("Please enter valid numbers");
+            if (isNaN(p) || isNaN(r) || !startDateStr || !endDateStr) {
+                alert("Please enter valid numbers and dates");
                 return;
             }
+
+            const startDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+
+            if (endDate < startDate) {
+                alert("End date cannot be before start date");
+                return;
+            }
+
+            const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            const t = daysDiff / 365;
 
             let interest = 0;
             let total = 0;
@@ -74,6 +93,7 @@
                 interest = total - p;
             }
 
+            document.getElementById('resTimePeriod').innerText = `${daysDiff} days (${t.toFixed(2)} years)`;
             document.getElementById('resInterest').innerText = interest.toFixed(2);
             document.getElementById('resTotal').innerText = total.toFixed(2);
             document.getElementById('calcResult').style.display = 'block';
