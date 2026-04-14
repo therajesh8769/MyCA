@@ -9,6 +9,21 @@
 </head>
 <body>
     <%-include('header')%>
+
+    <% if(success && success.length > 0) { %>
+        <div class="alert alert-success alert-dismissible fade show col-md-6 offset-md-3 mt-3" role="alert">
+          <%= success %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+
+    <% if(error && error.length > 0) { %>
+        <div class="alert alert-danger alert-dismissible fade show col-md-6 offset-md-3 mt-3" role="alert">
+          <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+
 <div class="row mt-3">
     <div class="col-8 offset-2">
         <form method="post" action="/login" novalidate class="needs-validation">
