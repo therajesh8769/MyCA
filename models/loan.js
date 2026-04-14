@@ -53,6 +53,14 @@ const loanSchema = new Schema({
     requestDate: {
         type: Date,
         default: Date.now
+    },
+    message: {
+        type: String,
+        default: ""
+    },
+    comments: {
+        type: String,
+        default: ""
     }
 });
 
