@@ -44,13 +44,64 @@
                                     From: <%= req.type === 'borrow' ? req.borrowerMobile : req.lenderMobile %><br>
                                     Amount: <%= req.amount %><br>
                                     Due: <%= new Date(req.dueDate).toLocaleDateString() %><br>
+                                    <% if (req.message) { %>
+                                        Message: <em><%= req.message %></em>
+                                    <% } %><br>
+                                    <% if (req.message) { %>
+                                        Message: <em><%= req.message %></em><br>
+                                    <% } %>
                                     <div class="mt-2">
-                                        <form action="/loans/<%= req._id %>/accept" method="POST" class="d-inline">
-                                            <button class="btn btn-sm btn-success">Accept</button>
-                                        </form>
-                                        <form action="/loans/<%= req._id %>/reject" method="POST" class="d-inline">
-                                            <button class="btn btn-sm btn-danger">Reject</button>
-                                        </form>
+                                        <!-- Trigger Modals -->
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#acceptModal<%= req._id %>">Accept</button>
+                                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal<%= req._id %>">Reject</button>
+
+                                        <!-- Accept Modal -->
+                                        <div class="modal fade" id="acceptModal<%= req._id %>" tabindex="-1" aria-hidden="true">
+                                          <div class="modal-dialog">
+                                            <div class="modal-content">
+                                              <form action="/loans/<%= req._id %>/accept" method="POST">
+                                                <div class="modal-header">
+                                                  <h5 class="modal-title">Accept Request</h5>
+                                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                  <div class="mb-3">
+                                                    <label for="comments" class="form-label">Comments (Optional)</label>
+                                                    <textarea class="form-control" name="comments" rows="2" placeholder="Add a comment..."></textarea>
+                                                  </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                  <button type="submit" class="btn btn-success">Confirm Accept</button>
+                                                </div>
+                                              </form>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <!-- Reject Modal -->
+                                        <div class="modal fade" id="rejectModal<%= req._id %>" tabindex="-1" aria-hidden="true">
+                                          <div class="modal-dialog">
+                                            <div class="modal-content">
+                                              <form action="/loans/<%= req._id %>/reject" method="POST">
+                                                <div class="modal-header">
+                                                  <h5 class="modal-title">Reject Request</h5>
+                                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                  <div class="mb-3">
+                                                    <label for="comments" class="form-label">Comments (Optional)</label>
+                                                    <textarea class="form-control" name="comments" rows="2" placeholder="Reason for rejection..."></textarea>
+                                                  </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                  <button type="submit" class="btn btn-danger">Confirm Reject</button>
+                                                </div>
+                                              </form>
+                                            </div>
+                                          </div>
+                                        </div>
                                         <!-- UPI Pay Link for Lenders accepting a borrow request -->
                                         <% if (req.type === 'borrow') { %>
                                             <%
@@ -61,7 +112,42 @@
                                             let upiId = encodeURIComponent(rawUpiId);
                                             let name = encodeURIComponent(rawName);
                                             %>
-                                            <a href="upi://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= req.amount %>&cu=INR&tn=Loan%20Request" class="btn btn-sm btn-info text-white">Accept & Pay via UPI</a>
+
+                                            <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#payModal<%= req._id %>">Accept & Pay</button>
+
+                                            <!-- Pay Modal -->
+                                            <div class="modal fade" id="payModal<%= req._id %>" tabindex="-1" aria-hidden="true">
+                                              <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                  <div class="modal-header">
+                                                    <h5 class="modal-title">Payment Options</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                  </div>
+                                                  <div class="modal-body text-center">
+                                                    <p>Scan the QR code or choose an app to pay.</p>
+                                                    <% let upiUrlPending = `upi://pay?pa=${upiId}&pn=${name}&am=${req.amount}&cu=INR&tn=Loan%20Request`; %>
+                                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<%= encodeURIComponent(upiUrlPending) %>" alt="UPI QR Code" class="img-fluid mb-4">
+
+                                                    <div class="d-grid gap-2">
+                                                        <a href="phonepe://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= req.amount %>&cu=INR&tn=Loan%20Request" class="btn btn-outline-primary">Pay via PhonePe</a>
+                                                        <a href="tez://upi/pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= req.amount %>&cu=INR&tn=Loan%20Request" class="btn btn-outline-danger">Pay via Google Pay</a>
+                                                        <a href="paytmmp://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= req.amount %>&cu=INR&tn=Loan%20Request" class="btn btn-outline-info">Pay via Paytm</a>
+                                                        <a href="whatsapp://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= req.amount %>&cu=INR&tn=Loan%20Request" class="btn btn-outline-success">Pay via WhatsApp</a>
+                                                        <a href="<%= upiUrlPending %>" class="btn btn-primary">Other UPI Apps</a>
+                                                    </div>
+
+                                                    <form action="/loans/<%= req._id %>/accept" method="POST" class="mt-4">
+                                                        <div class="mb-3 text-start">
+                                                          <label for="comments" class="form-label">Add Comments (Optional) after payment</label>
+                                                          <textarea class="form-control" name="comments" rows="2" placeholder="Payment completed..."></textarea>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-success w-100">Mark as Accepted</button>
+                                                    </form>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+
                                         <% } %>
                                     </div>
                                 </li>
@@ -93,6 +179,36 @@
             </div>
         </div>
 
+
+        <div class="row">
+            <!-- Rejected Requests -->
+            <div class="col-md-12 mb-4">
+                <div class="card border-dark">
+                    <div class="card-header bg-dark text-white">Rejected Requests</div>
+                    <ul class="list-group list-group-flush">
+                        <% if(typeof rejectedRequests !== 'undefined' && rejectedRequests.length > 0) { %>
+                            <% rejectedRequests.forEach(req => { %>
+                                <li class="list-group-item">
+                                    <strong><%= req.type === 'borrow' ? 'Borrowing' : 'Lending' %></strong><br>
+                                    To Mobile: <%= req.type === 'borrow' ? req.lenderMobile : req.borrowerMobile %><br>
+                                    Amount: <%= req.amount %><br>
+                                    <% if (req.message) { %>
+                                        Message: <em><%= req.message %></em><br>
+                                    <% } %>
+                                    Status: <span class="badge bg-danger">Rejected</span><br>
+                                    <% if (req.comments) { %>
+                                        Rejection Reason: <strong><%= req.comments %></strong>
+                                    <% } %>
+                                </li>
+                            <% }) %>
+                        <% } else { %>
+                            <li class="list-group-item text-muted">No rejected requests.</li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <!-- Active Borrowings -->
             <div class="col-md-6 mb-4">
@@ -108,6 +224,9 @@
                                     Amount: <%= loan.amount %><br>
                                     Due: <%= new Date(loan.dueDate).toLocaleDateString() %><br>
                                     Interest: <%= loan.category === 'with_interest' ? loan.interestRate + '% ' + loan.interestType : 'None' %><br>
+                                    <% if (loan.comments) { %>
+                                        Comments: <em><%= loan.comments %></em><br>
+                                    <% } %>
                                     <form action="/loans/<%= loan._id %>/settle" method="POST" class="mt-2 d-inline">
                                         <button class="btn btn-sm btn-outline-danger">Mark Settled</button>
                                     </form>
@@ -117,7 +236,38 @@
                                     let upiId = encodeURIComponent(rawUpiId);
                                     let name = encodeURIComponent(rawName);
                                     %>
-                                    <a href="upi://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= loan.amount %>&cu=INR&tn=Loan%20Repayment" class="btn btn-sm btn-info text-white mt-2">Pay via UPI</a>
+
+                                    <button type="button" class="btn btn-sm btn-info text-white mt-2" data-bs-toggle="modal" data-bs-target="#payActiveModal<%= loan._id %>">Pay</button>
+
+                                    <!-- Pay Active Modal -->
+                                    <div class="modal fade" id="payActiveModal<%= loan._id %>" tabindex="-1" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title">Payment Options</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                          </div>
+                                          <div class="modal-body text-center">
+                                            <p>Scan the QR code or choose an app to pay.</p>
+                                            <% let upiUrlActive = `upi://pay?pa=${upiId}&pn=${name}&am=${loan.amount}&cu=INR&tn=Loan%20Repayment`; %>
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<%= encodeURIComponent(upiUrlActive) %>" alt="UPI QR Code" class="img-fluid mb-4">
+
+                                            <div class="d-grid gap-2">
+                                                <a href="phonepe://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= loan.amount %>&cu=INR&tn=Loan%20Repayment" class="btn btn-outline-primary">Pay via PhonePe</a>
+                                                <a href="tez://upi/pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= loan.amount %>&cu=INR&tn=Loan%20Repayment" class="btn btn-outline-danger">Pay via Google Pay</a>
+                                                <a href="paytmmp://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= loan.amount %>&cu=INR&tn=Loan%20Repayment" class="btn btn-outline-info">Pay via Paytm</a>
+                                                <a href="whatsapp://pay?pa=<%= upiId %>&pn=<%= name %>&am=<%= loan.amount %>&cu=INR&tn=Loan%20Repayment" class="btn btn-outline-success">Pay via WhatsApp</a>
+                                                <a href="<%= upiUrlActive %>" class="btn btn-primary">Other UPI Apps</a>
+                                            </div>
+
+                                            <form action="/loans/<%= loan._id %>/settle" method="POST" class="mt-4">
+                                                <button type="submit" class="btn btn-danger w-100">Mark as Settled</button>
+                                            </form>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
                                 </li>
                             <% }) %>
                         <% } %>
@@ -139,6 +289,9 @@
                                     Amount: <%= loan.amount %><br>
                                     Due: <%= new Date(loan.dueDate).toLocaleDateString() %><br>
                                     Interest: <%= loan.category === 'with_interest' ? loan.interestRate + '% ' + loan.interestType : 'None' %><br>
+                                    <% if (loan.comments) { %>
+                                        Comments: <em><%= loan.comments %></em><br>
+                                    <% } %>
                                     <form action="/loans/<%= loan._id %>/settle" method="POST" class="mt-2 d-inline">
                                         <button class="btn btn-sm btn-outline-success">Mark Settled</button>
                                     </form>

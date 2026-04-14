@@ -62,7 +62,15 @@ router.get("/", isLoggedIn, wrapAsync(async (req, res) => {
         ]
     }).populate('borrower lender');
 
-    res.render("loans/index.ejs", { sentRequests, receivedRequests, activeBorrowings, activeLendings });
+    // Rejected Requests (sent by me)
+    const rejectedRequests = await Loan.find({
+        $or: [
+            { borrower: req.user._id, type: 'borrow', status: 'rejected' },
+            { lender: req.user._id, type: 'lend', status: 'rejected' }
+        ]
+    }).populate('borrower lender');
+
+    res.render("loans/index.ejs", { sentRequests, receivedRequests, activeBorrowings, activeLendings, rejectedRequests });
 }));
 
 // 2. Render Form to Create New Loan
@@ -76,7 +84,7 @@ router.get("/new", isLoggedIn, (req, res) => {
 
 // 3. Create Loan Request
 router.post("/", isLoggedIn, wrapAsync(async (req, res) => {
-    const { type, targetMobile, amount, dueDate, category, interestRate, interestType } = req.body;
+    const { type, targetMobile, amount, dueDate, category, interestRate, interestType, message } = req.body;
 
     if (!req.user.mobileNo) {
         req.flash('error', 'You must have a mobile number to create a request.');
@@ -104,7 +112,8 @@ router.post("/", isLoggedIn, wrapAsync(async (req, res) => {
         dueDate,
         category,
         interestRate: category === 'with_interest' ? interestRate : 0,
-        interestType: category === 'with_interest' ? interestType : 'none'
+        interestType: category === 'with_interest' ? interestType : 'none',
+        message
     });
 
     await loan.save();
@@ -120,6 +129,8 @@ router.post("/:id/accept", isLoggedIn, wrapAsync(async (req, res) => {
         return res.redirect('/loans');
     }
 
+    const { comments } = req.body;
+
     // Verify current user is the target of the request
     const isTarget = (loan.type === 'borrow' && loan.lenderMobile === req.user.mobileNo) ||
                      (loan.type === 'lend' && loan.borrowerMobile === req.user.mobileNo);
@@ -134,6 +145,7 @@ router.post("/:id/accept", isLoggedIn, wrapAsync(async (req, res) => {
     if (loan.type === 'lend') loan.borrower = req.user._id;
 
     loan.status = 'accepted';
+    if (comments) loan.comments = comments;
     await loan.save();
 
     req.flash('success', 'Request accepted.');
@@ -148,6 +160,8 @@ router.post("/:id/reject", isLoggedIn, wrapAsync(async (req, res) => {
         return res.redirect('/loans');
     }
 
+    const { comments } = req.body;
+
     // Ensure the current user is involved in the loan request
     const isTarget = (loan.type === 'borrow' && loan.lenderMobile === req.user.mobileNo) ||
                      (loan.type === 'lend' && loan.borrowerMobile === req.user.mobileNo);
@@ -158,6 +172,7 @@ router.post("/:id/reject", isLoggedIn, wrapAsync(async (req, res) => {
     }
 
     loan.status = 'rejected';
+    if (comments) loan.comments = comments;
     await loan.save();
 
     req.flash('success', 'Request rejected.');
